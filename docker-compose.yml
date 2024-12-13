@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  user_service:
+    build:
+      context: ./microservices/user_service
+    ports:
+      - "5001:5001"
+    networks:
+      - backend_network
+    depends_on:
+      - database_service
+
+  product_service:
+    build:
+      context: ./microservices/product_service
+    ports:
+      - "5002:5002"
+    networks:
+      - backend_network
+    depends_on:
+      - database_service
+
+  order_service:
+    build:
+      context: ./microservices/order_service
+    ports:
+      - "5003:5003"
+    networks:
+      - backend_network
+    depends_on:
+      - database_service
+
+  database_service:
+    image: mysql:5.7
+    networks:
+      - backend_network
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: dbname
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_INITDB_SKIP_TZ_VALIDATION: 1  # Optional, to avoid timezone warnings
+    volumes:
+      - ./database_service/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+
+
+  frontend:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+    networks:
+      - frontend_network
+
+networks:
+  frontend_network:
+  backend_network:

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Authentication</title>
+    <style>
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <h2>User Authentication</h2>
+
+    <!-- Login Form -->
+    <div id="login-form">
+        <h3>Login</h3>
+        <form id="loginForm" method="POST">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required><br><br>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required><br><br>
+            <button type="submit">Login</button>
+        </form>
+        <div id="message"></div>
+        <button onclick="toggleForms()">Don't have an account? Sign Up</button>
+    </div>
+
+    <!-- Signup Form -->
+    <div id="signup-form" class="hidden">
+        <h3>Sign Up</h3>
+        <form id="signupForm" method="POST">
+            <label for="new-username">Username:</label>
+            <input type="text" id="new-username" name="username" required><br><br>
+            <label for="new-password">Password:</label>
+            <input type="password" id="new-password" name="password" required><br><br>
+            <button type="submit">Sign Up</button>
+        </form>
+        <div id="signup-message"></div>
+        <button onclick="toggleForms()">Already have an account? Login</button>
+    </div>
+
+    <script>
+        const baseUrl = 'http://localhost:5001';  // Define base URL here
+
+        document.getElementById('loginForm').onsubmit = async function(event) {
+            event.preventDefault();
+            const formData = {
+                username: document.getElementById('username').value,
+                password: document.getElementById('password').value
+            };
+            const response = await fetch(`${baseUrl}/login`, {  // Use base URL
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData),
+            });
+            const result = await response.json();
+            document.getElementById('message').innerText = result.message;
+
+            // Check for successful login and redirect to dashboard
+            if (response.ok) {
+                window.location.href = 'dashboard.html'; // Redirect on success
+            }
+        };
+
+        document.getElementById('signupForm').onsubmit = async function(event) {
+            event.preventDefault();
+            const formData = {
+                username: document.getElementById('new-username').value,
+                password: document.getElementById('new-password').value
+            };
+            const response = await fetch(`${baseUrl}/signup`, {  // Use base URL
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData),
+            });
+            const result = await response.json();
+            document.getElementById('signup-message').innerText = result.message;
+        };
+
+        function toggleForms() {
+            const loginForm = document.getElementById('login-form');
+            const signupForm = document.getElementById('signup-form');
+            loginForm.classList.toggle('hidden');
+            signupForm.classList.toggle('hidden');
+        }
+    </script>
+</body>
+</html>
